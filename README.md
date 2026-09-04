@@ -1,13 +1,13 @@
 # JTSG Morning Brief: setup
 
 This repository exists to host one thing: the installer for the JTSG Morning
-Brief, published on the Releases page. It is public so that the download link
-is clickable without a GitHub account, and because email providers block
-`.exe` attachments.
+Brief, published on the Releases page. The download link is clickable without
+a GitHub account, which matters because email providers block `.exe`
+attachments.
 
-Nothing here reveals how the brief is produced. The master prompt, the
-verification gates and the PDF generator live in a separate private
-repository, which the installed application fetches with a read-only token.
+The pipeline itself lives in a separate repository,
+[jtsg-morning-brief-pipeline](https://github.com/Udayaaji/jtsg-morning-brief-pipeline),
+which the installed application fetches on every run.
 
 ## Status
 
@@ -20,6 +20,8 @@ page is a placeholder.
   and no change to the system PATH.
 - Fetch its own private Python and dependencies at install time, so nothing
   already on the machine is touched or upgraded.
+- Update itself by pulling the pipeline's `stable` branch before each run,
+  falling back to its cached copy if the machine is offline.
 - Ask one question: which folder the daily PDF should be delivered to.
 - Register a scheduled task that catches up when the laptop is opened, rather
   than firing at a fixed time and missing the day.
