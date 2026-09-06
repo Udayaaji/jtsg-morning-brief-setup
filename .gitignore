@@ -1,2 +1,4 @@
 dist/
 *.log
+app/uv.exe
+app/version.txt

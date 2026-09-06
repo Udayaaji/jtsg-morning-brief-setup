@@ -31,7 +31,7 @@ ArchitecturesInstallIn64BitMode=x64compatible
 SetupLogging=yes
 
 [Files]
-Source: "app\*"; DestDir: "{app}\app"; Flags: ignoreversion recursesubdirs
+Source: "app\*"; DestDir: "{app}\app"; Excludes: "uv.exe,version.txt"; Flags: ignoreversion recursesubdirs
 
 [Icons]
 Name: "{group}\Sign in to Claude"; Filename: "{app}\app\Sign in to Claude.cmd"
@@ -39,14 +39,19 @@ Name: "{group}\Run Morning Brief now"; Filename: "{app}\app\Run Morning Brief no
 Name: "{group}\Morning Brief schedule"; Filename: "{app}\pristine\jtsg_schedule.bat"
 Name: "{group}\Morning Brief folder"; Filename: "{code:GetDeliveryFolder}"
 
+; bootstrap.ps1 is not run from here: [Run] ignores exit codes, so a setup
+; failure would be invisible. It runs from CurStepChanged(ssPostInstall)
+; instead, which can read the exit code and show the reason.
 [Run]
-Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -NoProfile -File ""{app}\app\bootstrap.ps1"""; StatusMsg: "Setting up the Morning Brief (2 to 5 minutes)..."; Flags: waituntilterminated
 Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -NoProfile -WindowStyle Hidden -File ""{app}\app\jtsg_launcher.ps1"""; Description: "Generate today's brief now"; Flags: postinstall nowait unchecked skipifsilent
 
 [UninstallRun]
 Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -NoProfile -File ""{app}\app\uninstall_cleanup.ps1"""; Flags: runhidden; RunOnceId: "cleanup"
 
 [UninstallDelete]
+; app\ carries uv.exe and version.txt, which bootstrap wrote after the install
+; and which are therefore not in the uninstall log.
+Type: filesandordirs; Name: "{app}\app"
 Type: filesandordirs; Name: "{app}\pristine"
 Type: filesandordirs; Name: "{app}\pristine_prev"
 Type: filesandordirs; Name: "{app}\workspace"
@@ -90,6 +95,7 @@ begin
   try
     Http := CreateOleObject('WinHttp.WinHttpRequest.5.1');
     Http.Open('GET', 'https://api.github.com/repos/{#RepoOwner}/{#RepoName}/branches/stable', False);
+    Http.SetTimeouts(5000, 5000, 10000, 10000);
     Http.SetRequestHeader('Authorization', 'Bearer ' + Key);
     Http.SetRequestHeader('User-Agent', 'jtsg-morning-brief-setup');
     Http.Send('');
@@ -142,6 +148,11 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   Cfg: String;
+  FailPath: String;
+  Reason: String;
+  ReasonBytes: AnsiString;
+  ResultCode: Integer;
+  Started: Boolean;
 begin
   if CurStep = ssInstall then
   begin
@@ -155,5 +166,26 @@ begin
       '}' + #13#10;
     ForceDirectories(ExpandConstant('{app}'));
     SaveStringToFile(ExpandConstant('{app}\config.json'), Cfg, False);
+  end;
+
+  if CurStep = ssPostInstall then
+  begin
+    Started := Exec(ExpandConstant('{sys}\WindowsPowerShell\v1.0\powershell.exe'),
+      '-ExecutionPolicy Bypass -NoProfile -File "' + ExpandConstant('{app}\app\bootstrap.ps1') + '"',
+      ExpandConstant('{app}\app'), SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode);
+    if (not Started) or (ResultCode <> 0) then
+    begin
+      Reason := '';
+      FailPath := ExpandConstant('{app}\logs\setup_failed.txt');
+      if FileExists(FailPath) then
+      begin
+        if LoadStringFromFile(FailPath, ReasonBytes) then
+          Reason := Trim(ReasonBytes);
+      end;
+      if Reason = '' then
+        Reason := 'The setup step could not be started.';
+      MsgBox('Setup did not complete.' + #13#10#13#10 + Reason + #13#10#13#10 +
+        'Take a screenshot of this message and send it to support.', mbError, MB_OK);
+    end;
   end;
 end;

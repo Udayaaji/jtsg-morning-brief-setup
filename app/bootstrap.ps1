@@ -33,6 +33,14 @@ function Fail([string]$m) {
     Write-Host ''
     Write-Host "SETUP FAILED: $m" -ForegroundColor Red
     Write-Host 'Take a photo or screenshot of this window and send it to support.'
+    # The installer reads this file to name the reason in its own message box,
+    # and the pause keeps the console readable after the process exits.
+    try {
+        $logDir = Join-Path $Root 'logs'
+        if (-not (Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir -Force | Out-Null }
+        [IO.File]::WriteAllText((Join-Path $logDir 'setup_failed.txt'), "$m`r`n", $Utf8)
+    } catch {}
+    Read-Host 'Press Enter to close this window' | Out-Null
     exit 1
 }
 
@@ -50,7 +58,9 @@ function Register-BriefTask {
     $existing = Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
     if ($existing) {
         $current = [string]$existing.Actions[0].Arguments
-        if ($current.IndexOf($Root, [StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        # Match the exact launcher path, not the root: root alone is a prefix of
+        # every sibling install folder (for example "... Test2").
+        if ($current.IndexOf($launcher, [StringComparison]::OrdinalIgnoreCase) -lt 0) {
             Write-Host "A '$TaskName' task already exists for another installation; schedule registration skipped." -ForegroundColor Yellow
             return
         }
@@ -70,6 +80,13 @@ try {
     $cfg = Read-Config $Root
     foreach ($d in 'state', 'logs', 'workspace', 'python', 'uv_cache', 'claude_profile') {
         New-Item -ItemType Directory -Path (Join-Path $Root $d) -Force | Out-Null
+    }
+    Remove-Item (Join-Path $Root 'logs\setup_failed.txt') -Force -ErrorAction SilentlyContinue
+    # The Start Menu shortcut points here, so it has to exist from the first day.
+    try {
+        New-Item -ItemType Directory -Path $cfg.delivery_folder -Force | Out-Null
+    } catch {
+        Write-Host "Could not create the delivery folder $($cfg.delivery_folder): $($_.Exception.Message)" -ForegroundColor Yellow
     }
 
     Step 'Downloading the Python installer (uv)'
@@ -95,7 +112,10 @@ try {
     $env:UV_CACHE_DIR = Join-Path $Root 'uv_cache'
 
     Step 'Installing a private Python 3.12 (nothing else on this computer is changed)'
-    & $uv python install 3.12
+    # --no-bin keeps uv from dropping a python3.12.exe shim into the user's
+    # ~\.local\bin, and --no-registry keeps the interpreter out of the Windows
+    # registry. Everything this install creates stays under <root>\python.
+    & $uv python install 3.12 --no-bin --no-registry
     if ($LASTEXITCODE -ne 0) { Fail 'the Python install did not complete' }
 
     Step 'Downloading the Morning Brief pipeline'
@@ -136,14 +156,22 @@ try {
 
     if (-not $SkipSignIn) {
         Step 'Signing in to Claude (a browser window will open; sign in with the firm''s Claude account)'
-        $env:CLAUDE_CONFIG_DIR = Join-Path $Root 'claude_profile'
-        & $claudeExe auth login --claudeai
-        $statusText = & $claudeExe auth status --json | Out-String
-        if ($statusText -match '"loggedIn"\s*:\s*true') {
-            $email = ''
-            if ($statusText -match '"email"\s*:\s*"([^"]+)"') { $email = $Matches[1] }
-            Write-Host "Signed in as $email" -ForegroundColor Green
-        } else {
+        # The install is already complete at this point, so a sign-in that fails
+        # must never reach the outer catch and be reported as a setup failure.
+        try {
+            $env:CLAUDE_CONFIG_DIR = Join-Path $Root 'claude_profile'
+            & $claudeExe auth login --claudeai
+            $statusText = & $claudeExe auth status --json | Out-String
+            if ($statusText -match '"loggedIn"\s*:\s*true') {
+                $email = ''
+                if ($statusText -match '"email"\s*:\s*"([^"]+)"') { $email = $Matches[1] }
+                $plan = ''
+                if ($statusText -match '"subscriptionType"\s*:\s*"([^"]+)"') { $plan = $Matches[1] }
+                Write-Host "Signed in as $email ($plan)" -ForegroundColor Green
+            } else {
+                Write-Host 'Not signed in yet. Use "Sign in to Claude" from the Start Menu when ready.' -ForegroundColor Yellow
+            }
+        } catch {
             Write-Host 'Not signed in yet. Use "Sign in to Claude" from the Start Menu when ready.' -ForegroundColor Yellow
         }
     }
