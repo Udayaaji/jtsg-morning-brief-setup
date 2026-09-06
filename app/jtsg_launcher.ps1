@@ -111,9 +111,13 @@ function Enter-RunLock([string]$root) {
     if (Test-Path $lock) {
         $age = (Get-Date) - (Get-Item $lock).LastWriteTime
         if ($age.TotalHours -lt 3) { return $false }
-        Remove-Item $lock -Force
     }
     try {
+        # Deleting the stale lock belongs inside the try: with ErrorActionPreference
+        # set to Stop, a delete that fails (a sibling run older than three hours is
+        # still alive and holding it, or an ACL problem) would otherwise terminate
+        # the script before anything is logged. Failing to take the lock is enough.
+        if (Test-Path $lock) { Remove-Item $lock -Force }
         $fs = [IO.File]::Open($lock, [IO.FileMode]::CreateNew, [IO.FileAccess]::Write, [IO.FileShare]::None)
         $bytes = [Text.Encoding]::ASCII.GetBytes([string]$PID)
         $fs.Write($bytes, 0, $bytes.Length)
@@ -200,7 +204,15 @@ function Update-Pristine([string]$root, $cfg) {
             -Headers @{ Authorization = "Bearer $($cfg.access_key)"; 'User-Agent' = 'jtsg-morning-brief-launcher' }
         $result = Install-PristineFromZip $root $zip
         if ($result.ok) {
-            Move-Item $zip (Join-Path $root 'state\last_good.zip') -Force
+            # Archiving the download is not part of the install. By this point
+            # pristine has been swapped and pristine_hashes.json describes the new
+            # tree, so a failure to keep the zip must not be reported as a fetch
+            # failure: that would leave the runner stamping the old SHA.
+            try {
+                Move-Item $zip (Join-Path $root 'state\last_good.zip') -Force
+            } catch {
+                Write-Log $root ((Get-RunDate).ToString('yyyy-MM-dd')) "could not archive the download as last_good.zip: $($_.Exception.Message)"
+            }
         }
     } catch {
         $msg = $_.Exception.Message
@@ -243,6 +255,21 @@ function Invoke-Launcher {
         return 0
     }
     try {
+        # An update interrupted between the rename and the move leaves a complete
+        # pristine_prev\ and no pristine\. Put it back before anything else looks
+        # for the runner, or the client is told no earlier copy exists while a good
+        # one sits beside it. This runs under the lock because a live sibling run
+        # may be mid-swap, and that run holds the lock.
+        $pristineDir = Join-Path $root 'pristine'
+        $prevDir = Join-Path $root 'pristine_prev'
+        if ((-not (Test-Path $pristineDir)) -and (Test-Path $prevDir)) {
+            try {
+                Rename-Item $prevDir 'pristine'
+                Write-Log $root $iso 'recovered pristine from an interrupted update'
+            } catch {
+                Write-Log $root $iso "could not recover pristine from pristine_prev: $($_.Exception.Message)"
+            }
+        }
         $pdf = Join-Path ([string]$cfg.delivery_folder) "Morning_Brief_JTSG_$suffix.pdf"
         if (Test-Path $pdf) {
             Write-Log $root $iso "today's brief already exists at $pdf, nothing to do"
