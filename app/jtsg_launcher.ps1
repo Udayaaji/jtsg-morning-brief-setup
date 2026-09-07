@@ -88,6 +88,13 @@ function Set-KeepAwake([bool]$on) {
 }
 
 function Show-Toast([string]$title, [string]$body, [string]$openFolder, [bool]$enabled) {
+    # JTSG_SUPPRESS_TOAST is set only by the author's test harness, which runs
+    # this launcher for real against throwaway roots. Without it the
+    # config-error path below cannot honour a config that says "toast": false,
+    # because the config is exactly what could not be read, so every test run
+    # raised a real notification on the author's desktop pointing at a temp
+    # folder. It is never set on a client machine.
+    if ($env:JTSG_SUPPRESS_TOAST -eq '1') { return }
     if (-not $enabled) { return }
     try {
         [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
