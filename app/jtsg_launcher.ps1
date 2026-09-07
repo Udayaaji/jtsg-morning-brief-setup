@@ -94,7 +94,21 @@ function Show-Toast([string]$title, [string]$body, [string]$openFolder, [bool]$e
     # because the config is exactly what could not be read, so every test run
     # raised a real notification on the author's desktop pointing at a temp
     # folder. It is never set on a client machine.
-    if ($env:JTSG_SUPPRESS_TOAST -eq '1') { return }
+    # Suppressed is never silent: the notification is written to the
+    # launcher log instead, so a genuine setup-failure toast is still on
+    # the record if this is ever set machine-wide.
+    if ($env:JTSG_SUPPRESS_TOAST -eq '1') {
+        $line = "toast suppressed: $title - $body"
+        $logged = $false
+        if ($script:Root) {
+            try {
+                Write-Log $script:Root ((Get-RunDate).ToString('yyyy-MM-dd')) $line
+                $logged = $true
+            } catch {}
+        }
+        if (-not $logged) { Write-Host $line }
+        return
+    }
     if (-not $enabled) { return }
     try {
         [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
