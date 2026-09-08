@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JTSG Morning Brief: everyday guide</title>
+<style>
+  :root {
+    --maroon: #6B1D3A;
+    --green: #1B7A3D;
+    --ink: #1c1c1e;
+    --muted: #5a5a60;
+    --rule: #e2e2e6;
+    --panel: #faf7f8;
+  }
+  html { background: #ffffff; }
+  body {
+    margin: 0 auto; padding: 2.5rem 1.5rem 4rem; max-width: 46rem;
+    font: 16px/1.65 "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    color: var(--ink); background: #ffffff;
+  }
+  h1 {
+    font-size: 1.7rem; line-height: 1.25; margin: 0 0 .3rem;
+    color: var(--maroon);
+  }
+  .sub { color: var(--muted); margin: 0 0 2rem; }
+  h2 {
+    font-size: 1.15rem; margin: 2.4rem 0 .6rem; color: var(--maroon);
+    border-bottom: 2px solid var(--rule); padding-bottom: .3rem;
+  }
+  h3 { font-size: 1rem; margin: 1.4rem 0 .3rem; color: var(--green); }
+  p, li { margin: .5rem 0; }
+  ul { padding-left: 1.3rem; }
+  strong { color: var(--ink); }
+  code {
+    background: var(--panel); border: 1px solid var(--rule);
+    border-radius: 3px; padding: .05rem .3rem;
+    font: .9em/1 Consolas, "Courier New", monospace;
+  }
+  .panel {
+    background: var(--panel); border-left: 3px solid var(--green);
+    padding: .8rem 1rem; margin: 1rem 0; border-radius: 0 4px 4px 0;
+  }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+  th, td {
+    text-align: left; vertical-align: top; padding: .5rem .6rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  th { color: var(--maroon); font-size: .85rem; text-transform: uppercase;
+       letter-spacing: .04em; }
+  footer {
+    margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--rule);
+    color: var(--muted); font-size: .9rem;
+  }
+</style>
+</head>
+<body>
+
+<h1>JTSG Morning Brief</h1>
+<p class="sub">Everyday guide. Installation is already done; this covers using it.</p>
+
+<h2>What happens every morning</h2>
+<p>
+  The brief is generated <strong>Monday to Saturday</strong>. The scheduled time
+  is <strong>06:40</strong>, and it also starts when you sign in to Windows, so
+  on a day you sign in earlier it is produced then instead. Sundays are skipped.
+</p>
+<p>
+  A run takes <strong>10 to 30 minutes</strong>. Keep the lid open while it
+  works; the computer will not go to sleep on its own during a run. If the
+  machine was off at 06:40, the run is picked up the next time you sign in.
+</p>
+
+<h2>What arrives in the delivery folder</h2>
+<p>
+  Four files a day, in the folder you chose at install (by default
+  <code>Documents\JTSG Morning Brief</code>). You can move or delete them
+  freely; nothing depends on them staying there.
+</p>
+<table>
+  <tr><th>File</th><th>What it is</th></tr>
+  <tr>
+    <td><code>Morning_Brief_JTSG_&lt;date&gt;.pdf</code></td>
+    <td>The brief itself. Review it before circulating it.</td>
+  </tr>
+  <tr>
+    <td><code>Morning_Brief_Status_&lt;date&gt;.md</code></td>
+    <td>What happened this morning, and anything you need to know. Start here
+        on a day something looks off.</td>
+  </tr>
+  <tr>
+    <td><code>sources_&lt;date&gt;.md</code></td>
+    <td>Every web page the research actually opened, so any figure in the brief
+        can be traced back.</td>
+  </tr>
+  <tr>
+    <td><code>social_&lt;date&gt;.md</code></td>
+    <td>Short posts drawn from the day's brief, ready to adapt.</td>
+  </tr>
+</table>
+
+<div class="panel">
+  <strong>A PDF stamped "UNVERIFIED DRAFT, NOT FOR CIRCULATION" is never a
+  deliverable.</strong> Every brief passes a chain of automatic checks before it
+  is released, and the watermark means one of them was skipped. If you ever see
+  it, do not circulate the brief; send us the status report instead.
+</div>
+
+<h2>Reading the status report</h2>
+<p>
+  The top of the file is written for you and is usually four lines. It names
+  what happened and what, if anything, you need to do. Everything under
+  <strong>Details for support</strong> is for us: you never need to read it, but
+  when you report a problem, forward the whole file rather than a description of
+  it.
+</p>
+
+<h3>Market figures</h3>
+<p>
+  The brief carries eleven market figures. If any of them is not in today's
+  brief, the status report names it rather than letting it disappear quietly,
+  and tells you which kind of gap it is:
+</p>
+<ul>
+  <li>
+    <strong>"not a payload row, so a gap here can be routine"</strong> means the
+    figure comes from a dated news source rather than the market data feed.
+    Some mornings no such source has published yet. This is normal and needs
+    nothing from you.
+  </li>
+  <li>
+    <strong>"a payload row, so this should not be missing"</strong> means the
+    figure was available and still did not reach the brief. If you see this on
+    two days running, forward the status report to us.
+  </li>
+</ul>
+<p>
+  On a normal morning this section does not appear at all, which means every
+  figure is present.
+</p>
+
+<h2>Notifications, and what each one means</h2>
+<table>
+  <tr><th>Notification</th><th>What to do</th></tr>
+  <tr>
+    <td><strong>Morning Brief ready for review</strong></td>
+    <td>Click it to open the delivery folder. Review the PDF, then circulate it
+        when you are satisfied.</td>
+  </tr>
+  <tr>
+    <td><strong>Morning Brief not produced today</strong></td>
+    <td>Open the status report in the delivery folder. Its first lines say what
+        happened. Often nothing is needed from you and tomorrow's run continues
+        normally. If it asks you to forward the file, send it to us.</td>
+  </tr>
+  <tr>
+    <td><strong>Sign in to continue</strong></td>
+    <td>The stored Claude sign-in has expired. Start Menu, JTSG Morning Brief,
+        <strong>Sign in to Claude</strong>. This is routine, not a fault.</td>
+  </tr>
+  <tr>
+    <td><strong>Morning Brief is not set up correctly</strong></td>
+    <td>Click it to open the logs folder, then forward the launcher log to us.</td>
+  </tr>
+</table>
+
+<h2>Start Menu shortcuts</h2>
+<p>Under <strong>JTSG Morning Brief</strong>:</p>
+<ul>
+  <li><strong>Morning Brief folder</strong> opens where the briefs are saved.</li>
+  <li><strong>Run Morning Brief now</strong> starts a run immediately, for a day
+      you want it earlier or want to retry after a problem.</li>
+  <li><strong>Sign in to Claude</strong> renews the sign-in.</li>
+  <li><strong>Morning Brief schedule</strong> pauses, resumes or retimes the
+      morning run without opening Task Scheduler.</li>
+  <li><strong>Help</strong> opens this page.</li>
+</ul>
+
+<h2>Pausing or retiming the morning run</h2>
+<p>
+  Open <strong>Morning Brief schedule</strong>. It shows whether the run is
+  currently enabled and at what time, then offers a numbered menu. Use it to
+  pause the run while you are away and resume it when you return, or to move it
+  earlier or later.
+</p>
+<p>
+  It changes the schedule only. It cannot alter the brief or skip any of the
+  checks the brief passes before release.
+</p>
+
+<h2>About the Claude sign-in</h2>
+<p>
+  The single sign-in you did at the end of installation <em>is</em> the
+  connection. It is stored on this computer and every morning's run uses it. The
+  cost of generating the brief sits on the firm's Claude subscription; nothing
+  is billed by us.
+</p>
+<p>
+  If a morning is missed because the subscription's usage limit was reached, the
+  status report says so plainly. The limit resets on its own and the next
+  scheduled start or Windows sign-in tries again.
+</p>
+
+<h2>If something looks wrong</h2>
+<p>
+  Send us the day's <code>Morning_Brief_Status_&lt;date&gt;.md</code>. It is
+  designed so that one forwarded file is enough for us to work from, which saves
+  a round of questions. If there is no status report at all for that day, send
+  the launcher log from the logs folder instead.
+</p>
+
+<h2>Removing it</h2>
+<p>
+  Settings, Apps, JTSG Morning Brief, Uninstall. Your delivery folder and every
+  brief in it are left in place. Claude Code itself stays installed; remove it
+  separately if you want it gone.
+</p>
+
+<footer>
+  JTSG &amp; Co. LLP, Chartered Accountants. This page is stored on this
+  computer and works offline.
+</footer>
+
+</body>
+</html>

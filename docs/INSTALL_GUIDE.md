@@ -66,8 +66,13 @@ list of sources, and the status report. You can move or delete them freely.
 ## Start Menu shortcuts
 
 Under JTSG Morning Brief: **Sign in to Claude**, **Run Morning Brief now**,
-**Morning Brief schedule** (pause, resume or retime the morning run), and
-**Morning Brief folder**.
+**Morning Brief schedule** (pause, resume or retime the morning run),
+**Morning Brief folder**, and **Help**.
+
+**Help** opens an everyday guide stored on your own computer, covering the
+morning routine, the files you receive, what each notification means and how to
+pause the run. It works offline, so you do not need this page again once the
+install is done.
 
 ## The first two weeks
 

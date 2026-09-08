@@ -8,7 +8,9 @@ runs. It contains no secret and no pipeline code.
 
 Download: https://github.com/Udayaaji/jtsg-morning-brief-setup/releases/latest/download/JTSG-Morning-Brief-Setup.exe
 
-Guide: docs/INSTALL_GUIDE.md
+Guides: docs/INSTALL_GUIDE.md (before the install, read here) and
+docs/HELP.html (after it, installed to the client's machine and opened
+from the Start Menu Help shortcut).
 
 Build: `powershell -File build_installer.ps1 -Version 1.0.0 -Publish`
 (needs Inno Setup 6 and a signed-in `gh`).

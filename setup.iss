@@ -32,12 +32,20 @@ SetupLogging=yes
 
 [Files]
 Source: "app\*"; DestDir: "{app}\app"; Excludes: "uv.exe,version.txt"; Flags: ignoreversion recursesubdirs
+; HELP.html is the only doc that ships to the machine: it covers life AFTER
+; install, so the client is not sent back to GitHub to remember what a
+; notification means. INSTALL_GUIDE.md and its screenshot stay in the repo,
+; where they are read before the install exists. HTML, not Markdown, because
+; Windows has no default handler for .md and a Help shortcut that opens a
+; "how do you want to open this file?" prompt is worse than none.
+Source: "docs\HELP.html"; DestDir: "{app}\docs"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\Sign in to Claude"; Filename: "{app}\app\Sign in to Claude.cmd"
 Name: "{group}\Run Morning Brief now"; Filename: "{app}\app\Run Morning Brief now.cmd"
 Name: "{group}\Morning Brief schedule"; Filename: "{app}\pristine\jtsg_schedule.bat"
 Name: "{group}\Morning Brief folder"; Filename: "{code:GetDeliveryFolder}"
+Name: "{group}\Help"; Filename: "{app}\docs\HELP.html"
 
 ; bootstrap.ps1 is not run from here: [Run] ignores exit codes, so a setup
 ; failure would be invisible. It runs from CurStepChanged(ssPostInstall)
