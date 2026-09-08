@@ -3,8 +3,10 @@
 ; stale. No admin rights, no system PATH change, one folder under
 ; %LOCALAPPDATA%.
 
+; Fallback only: build_installer.ps1 passes /DAppVersion. Keep it in step with
+; the latest release, so a build run without -Version cannot mislabel itself.
 #ifndef AppVersion
-  #define AppVersion "1.0.0"
+  #define AppVersion "1.0.1"
 #endif
 #define AppName "JTSG Morning Brief"
 #define RepoOwner "Udayaaji"
