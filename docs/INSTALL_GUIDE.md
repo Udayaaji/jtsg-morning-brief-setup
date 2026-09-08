@@ -45,8 +45,9 @@ and sign in again. That is routine, not a fault.
 
 ## What happens every morning
 
-The brief is generated Monday to Saturday at 06:40, or as soon as you open the
-laptop and sign in to Windows after that. It takes 10 to 30 minutes. Keep the
+The brief is generated Monday to Saturday. The scheduled time is 06:40, and it
+also starts when you sign in to Windows, so on a day you sign in earlier it is
+produced then instead. Sundays are skipped. It takes 10 to 30 minutes. Keep the
 lid open; the computer will not sleep while it works.
 
 A notification appears when it is done:
@@ -56,6 +57,8 @@ A notification appears when it is done:
   in the delivery folder. The first lines say what happened and what to do.
   If it asks you to forward the file, send it to us.
 - **Sign in to continue**: see section 5.
+- **Morning Brief is not set up correctly**: click it to open the logs
+  folder, then forward the launcher log there to us for support.
 
 The delivery folder receives four files a day: the PDF, a social pack, the
 list of sources, and the status report. You can move or delete them freely.
