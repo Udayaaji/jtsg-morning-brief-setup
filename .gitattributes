@@ -3,3 +3,4 @@
 *.iss text eol=lf
 *.md text eol=lf
 *.cmd text eol=crlf
+*.png binary
